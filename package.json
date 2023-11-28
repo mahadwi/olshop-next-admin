@@ -11,9 +11,11 @@
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "autoprefixer": "10.4.15",
-    "cookies-next": "^4.0.0",
+    "axios": "^1.6.2",
+    "cookies-next": "^4.1.0",
     "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
+    "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "next": "13.4.19",
     "postcss": "8.4.30",
