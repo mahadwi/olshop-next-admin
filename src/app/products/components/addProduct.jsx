@@ -6,7 +6,7 @@ import { getCookie } from "cookies-next";
 import Swal from "sweetalert2";
 
 export default function AddProduct() {
-  // State variables to store form data
+
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState("");
@@ -18,27 +18,53 @@ export default function AddProduct() {
   const [warehouse, setWarehouse] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  // State variables to manage category and warehouse data
-  const [categories, setCategories] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
-
   // Get token from cookies for authorization
   const token = getCookie("adminAccessToken");
 
   // Next.js useRouter hook
   const router = useRouter();
 
+  // State variables to manage category and warehouse data
+  const [categories, setCategories] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
+  
   // Fetch categories and warehouses data on component mount
   useEffect(() => {
     const fetchCategoriesAndWarehouses = async () => {
       try {
+        const token = getCookie("adminAccessToken");
+
         // Fetch categories
-        const categoriesResponse = await fetch(`${BASE_URL}/category`);
+        const categoriesResponse = await fetch(`${BASE_URL}/category`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!categoriesResponse.ok) {
+          throw new Error(
+            `Categories request failed with status ${categoriesResponse.status}`
+          );
+        }
+
         const categoriesData = await categoriesResponse.json();
         setCategories(categoriesData);
 
         // Fetch warehouses
-        const warehousesResponse = await fetch(`${BASE_URL}/warehouse`);
+        const warehousesResponse = await fetch(`${BASE_URL}/warehouse`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!warehousesResponse.ok) {
+          throw new Error(
+            `Warehouses request failed with status ${warehousesResponse.status}`
+          );
+        }
+
         const warehousesData = await warehousesResponse.json();
         setWarehouses(warehousesData);
       } catch (error) {
@@ -46,7 +72,6 @@ export default function AddProduct() {
       }
     };
 
-    // Call the fetch function
     fetchCategoriesAndWarehouses();
   }, []);
 
@@ -74,35 +99,52 @@ export default function AddProduct() {
     e.preventDefault();
     try {
       // Create form data for product creation
-      const formData = new FormData();
-      formData.append("name", productName);
-      formData.append("description", description);
-      formData.append("color", color);
-      formData.append("stock", stock);
-      formData.append("price", price);
-      formData.append("weight", weight);
-      formData.append("photo", imageFile);
-      formData.append("category_id", category);
-      formData.append("warehouse_id", warehouse);
+      const productFormData = new FormData();
+      productFormData.append("name", productName);
+      productFormData.append("description", description);
+      productFormData.append("category_id", category);
+      productFormData.append("warehouse_id", warehouse);
 
       // Send a POST request to create a new product
-      const responseData = await fetch(`${BASE_URL}/products`, {
+      const productResponse = await fetch(`${BASE_URL}/products`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: formData,
+        body: productFormData,
         cache: "no-store",
       });
 
-      // Parse the response JSON
-      const response = await responseData.json();
+      // Parse the response JSON for product data
+      const productData = await productResponse.json();
+      const productId = productData.data.id; // Get the product ID from the response
+
+      // Create form data for product detail creation
+      const productDetailFormData = new FormData();
+      productDetailFormData.append("photo", imageFile);
+      productDetailFormData.append("color", color);
+      productDetailFormData.append("stock", stock);
+      productDetailFormData.append("price", price);
+      productDetailFormData.append("weight", weight);
+
+      // Send a POST request to create a new product detail
+      const productDetailResponse = await fetch(`${BASE_URL}/products/details/${productId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: productDetailFormData,
+        cache: "no-store",
+      });
+
+      // Parse the response JSON for product detail
+      const productDetailResponseData = await productDetailResponse.json();
 
       // Show success message using SweetAlert
       Swal.fire({
         icon: "success",
         title: "Create Product Success",
-        text: response.message,
+        text: productDetailResponseData.message,
         showConfirmButton: false,
         timer: 1500,
       });
@@ -112,6 +154,9 @@ export default function AddProduct() {
 
       // Refresh the page using router.push
       router.push(router.asPath);
+
+      // Refresh the products on the ProductPage
+      refreshProducts();
     } catch (error) {
       console.error(error);
     }

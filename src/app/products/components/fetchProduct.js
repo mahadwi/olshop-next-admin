@@ -17,7 +17,7 @@ export const getAllProducts = async () => {
 
 export const getProductById = async (productId) => {
   try {
-    const res = await fetch(`${BASE_URL}/product/${productId}`, {
+    const res = await fetch(`${BASE_URL}/products/${productId}`, {
       method: "GET",
       cache: "no-store",
     });
@@ -31,7 +31,7 @@ export const getProductById = async (productId) => {
 
 export const deleteProductById = async (productId) => {
   try {
-    const res = await fetch(`${BASE_URL}/product/${productId}`, {
+    const res = await fetch(`${BASE_URL}/products/${productId}`, {
       method: "DELETE",
       cache: "no-store",
     });
