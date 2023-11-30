@@ -1,7 +1,6 @@
 //src/app/product/page.js
 "use client";
 import { useEffect, useState } from "react";
-import ProductDetail from "./components/ProductDetail";
 import AddProduct from "./components/AddProduct";
 import BASE_URL from "@/lib/baseUrl";
 
@@ -43,7 +42,7 @@ export default function ProductPage() {
   return (
     <div className="flex flex-col items-center py-5 h-screen">
       <div className="w-3/4">
-        <h1 className="text-4xl font-bold text-center mb-10 text-white">Product List</h1>
+        <h1 className="text-4xl font-bold text-center mb-10 text-orange-600">Product List</h1>
         <div className="mb-5">
           <AddProduct refreshProducts={refreshProducts} />
         </div>
