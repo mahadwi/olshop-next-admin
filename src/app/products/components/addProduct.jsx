@@ -1,3 +1,4 @@
+//src/app/product/components/addProduct.js
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -6,7 +7,7 @@ import { getCookie } from "cookies-next";
 import Swal from "sweetalert2";
 
 export default function AddProduct() {
-
+  // State untuk menyimpan data formulir
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState("");
@@ -17,70 +18,71 @@ export default function AddProduct() {
   const [category, setCategory] = useState("");
   const [warehouse, setWarehouse] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-
-  // Get token from cookies for authorization
-  const token = getCookie("adminAccessToken");
-
-  // Next.js useRouter hook
-  const router = useRouter();
-
-  // State variables to manage category and warehouse data
+  const [imagePreview, setImagePreview] = useState("");
   const [categories, setCategories] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
-  
-  // Fetch categories and warehouses data on component mount
-  useEffect(() => {
-    const fetchCategoriesAndWarehouses = async () => {
-      try {
-        const token = getCookie("adminAccessToken");
 
-        // Fetch categories
-        const categoriesResponse = await fetch(`${BASE_URL}/category`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  // Mengambil token dari cookie untuk otentikasi
+  const token = getCookie("adminAccessToken");
 
-        if (!categoriesResponse.ok) {
-          throw new Error(
-            `Categories request failed with status ${categoriesResponse.status}`
-          );
-        }
+  // Menggunakan useRouter hook dari Next.js
+  const router = useRouter();
 
-        const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData);
+  const fetchCategories = async () => {
+    try {
+      const categoriesResponse = await fetch(`${BASE_URL}/category`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        // Fetch warehouses
-        const warehousesResponse = await fetch(`${BASE_URL}/warehouse`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!warehousesResponse.ok) {
-          throw new Error(
-            `Warehouses request failed with status ${warehousesResponse.status}`
-          );
-        }
-
-        const warehousesData = await warehousesResponse.json();
-        setWarehouses(warehousesData);
-      } catch (error) {
-        console.error(error);
+      if (!categoriesResponse.ok) {
+        throw new Error(
+          `Categories request failed with status ${categoriesResponse.status}`
+        );
       }
-    };
 
-    fetchCategoriesAndWarehouses();
+      const categoriesData = await categoriesResponse.json();
+      setCategories(categoriesData.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchWarehouses = async () => {
+    try {
+      const warehousesResponse = await fetch(`${BASE_URL}/warehouse`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!warehousesResponse.ok) {
+        throw new Error(
+          `Warehouses request failed with status ${warehousesResponse.status}`
+        );
+      }
+
+      const warehousesData = await warehousesResponse.json();
+      setWarehouses(warehousesData.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    fetchWarehouses();
   }, []);
 
-  // Toggle modal open/close
+  // Fungsi untuk membuka dan menutup modal
   const handleModal = () => {
     setIsOpen(!isOpen);
   };
 
-  // Handle image change and preview
+  // Mengelola perubahan gambar dan menampilkan pratinjau
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
@@ -94,18 +96,18 @@ export default function AddProduct() {
     }
   };
 
-  // Handle form submission
+  // Mengelola pengiriman formulir
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Create form data for product creation
+      // Membuat FormData untuk pembuatan produk
       const productFormData = new FormData();
       productFormData.append("name", productName);
       productFormData.append("description", description);
       productFormData.append("category_id", category);
       productFormData.append("warehouse_id", warehouse);
 
-      // Send a POST request to create a new product
+      // Mengirim permintaan POST untuk membuat produk baru
       const productResponse = await fetch(`${BASE_URL}/products`, {
         method: "POST",
         headers: {
@@ -115,11 +117,11 @@ export default function AddProduct() {
         cache: "no-store",
       });
 
-      // Parse the response JSON for product data
+      // Mendapatkan data produk dari respons JSON
       const productData = await productResponse.json();
-      const productId = productData.data.id; // Get the product ID from the response
+      const productId = productData.data.id;
 
-      // Create form data for product detail creation
+      // Membuat FormData untuk detail produk
       const productDetailFormData = new FormData();
       productDetailFormData.append("photo", imageFile);
       productDetailFormData.append("color", color);
@@ -127,20 +129,23 @@ export default function AddProduct() {
       productDetailFormData.append("price", price);
       productDetailFormData.append("weight", weight);
 
-      // Send a POST request to create a new product detail
-      const productDetailResponse = await fetch(`${BASE_URL}/products/details/${productId}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: productDetailFormData,
-        cache: "no-store",
-      });
+      // Mengirim permintaan POST untuk membuat detail produk
+      const productDetailResponse = await fetch(
+        `${BASE_URL}/products/details/${productId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: productDetailFormData,
+          cache: "no-store",
+        }
+      );
 
-      // Parse the response JSON for product detail
+      // Mendapatkan data detail produk dari respons JSON
       const productDetailResponseData = await productDetailResponse.json();
 
-      // Show success message using SweetAlert
+      // Menampilkan pesan sukses menggunakan SweetAlert
       Swal.fire({
         icon: "success",
         title: "Create Product Success",
@@ -149,13 +154,13 @@ export default function AddProduct() {
         timer: 1500,
       });
 
-      // Close the modal
+      // Menutup modal
       setIsOpen(false);
 
-      // Refresh the page using router.push
+      // Mereset halaman menggunakan router.push
       router.push(router.asPath);
 
-      // Refresh the products on the ProductPage
+      // Mereset produk pada ProductPage
       refreshProducts();
     } catch (error) {
       console.error(error);
@@ -173,10 +178,12 @@ export default function AddProduct() {
         </button>
         <div className={isOpen ? "modal modal-open" : "modal"}>
           <div className="modal-box bg-white p-8 rounded-md shadow-md">
-            <h3 className="text-xl font-bold mb-5 text-orange-600">Add New Product</h3>
+            <h3 className="text-xl font-bold mb-5 text-orange-600">
+              Add New Product
+            </h3>
             <form onSubmit={handleSubmit}>
               <div className="form-control w-full space-y-4">
-                <label className="label font-bold text-orange-600">Product Name</label>
+                <label className="label font-bold">Product Name</label>
                 <input
                   required
                   type="text"
@@ -232,6 +239,15 @@ export default function AddProduct() {
                   className="input input-sm input-bordered sm:input-md"
                   onChange={handleImageChange}
                 />
+                {imagePreview && (
+                  <div className="image-preview-container">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="image-preview"
+                    />
+                  </div>
+                )}
                 <label className="label font-bold">Category</label>
                 <select
                   required
