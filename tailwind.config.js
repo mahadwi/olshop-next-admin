@@ -7,10 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        'zebra-odd': 'your-color-here', 
+        'zebra-even': "#ec600b", 
       },
     },
   },
@@ -19,7 +18,7 @@ module.exports = {
     themes: [
       {
         mytheme: {
-          primary: "#2D5B76",
+          primary: "#ec600b",
 
           secondary: "#ffff",
 

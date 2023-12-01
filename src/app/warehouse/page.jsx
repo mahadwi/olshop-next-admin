@@ -1,10 +1,16 @@
 import Warehouse from "./components/Warehouse";
 import { getAllWarehouse } from "./components/fetch";
-// import { cookies } from "next/headers";
 import AddWarehouse from "./components/AddWarehouse";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const Warehouses = await getAllWarehouse();
+  const token = cookies().get("adminAccessToken");
+  const Warehouses = await getAllWarehouse(token.value);
+
+  if (Warehouses.error === "Unauthorized") {
+    redirect("/logout");
+  }
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -20,11 +26,12 @@ export default async function Page() {
                 <th className="hidden sm:block">No</th>
                 <th>Warehouse Name</th>
                 <th>Address</th>
+                <th>Jumlah Product</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {Warehouses.data.map((warehouse, index) => (
+              {Warehouses.map((warehouse, index) => (
                 <tr key={warehouse.id}>
                   <Warehouse warehouse={warehouse} index={index} />
                 </tr>
