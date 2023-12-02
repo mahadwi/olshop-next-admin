@@ -1,9 +1,13 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getAllCustomer } from "@/fetch/customer";
 
 export default async function Home() {
-  if (!cookies().get(`adminAccessToken`)) {
+  const token = cookies().get("adminAccessToken");
+  const Customers = await getAllCustomer(token.value);
+
+  if (!token) {
     redirect(`/login`);
   }
 
@@ -16,24 +20,46 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="container mx-auto justify-between">
-        <h1 className="text-3xl font-bold">Last User Order</h1>
-        <div className="lg:flex-col lg:-right-3 lg:-top-12 lg:float-right lg:gap-0 md:flex-row md:gap-5 flex flex-col items-center mt-4">
+      <div className="container mx-auto flex">
+        <div className="w-3/4">
+          <h1 className="text-3xl font-bold mb-4">Last User Order</h1>
+          <table className="table table-zebra table-sm md:w-3/4">
+            <thead>
+              <tr>
+                <th className="hidden sm:block">No</th>
+                <th>Username User</th>
+                <th>Email User</th>
+                <th>Phone User</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Customers.data.map((customer, index) => (
+                <tr key={customer.id}>
+                  <td className="hidden sm:block">{index + 1}</td>
+                  <td>{customer.username}</td>
+                  <td>{customer.email}</td>
+                  <td>{customer.phone}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="w-1/4 flex flex-col justify-center items-center">
           <Link href={"/order"}>
-            <div className="bg-white hover:bg-gray-200 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
-              <h2 className="text-center font-semibold text-6xl leading-none pt-2">100</h2>
+            <div className="bg-primary text-white hover:bg-orange-400 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
+              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">100</h2>
               <p className="text-center text-lg">Total User</p>
             </div>
           </Link>
           <Link href={"/order"}>
-            <div className="bg-white hover:bg-gray-200 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
-              <h2 className="text-center font-semibold text-6xl leading-none pt-2">5</h2>
-              <p className="text-center text-lg">Total Orders Today</p>
+            <div className="bg-primary text-white hover:bg-orange-400 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
+              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">10</h2>
+              <p className="text-center text-lg">Total Product Today</p>
             </div>
           </Link>
           <Link href={"/order"}>
-            <div className="bg-white hover:bg-gray-200 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
-              <h2 className="text-center font-semibold text-6xl leading-none pt-2">5</h2>
+            <div className="bg-primary text-white hover:bg-orange-400 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
+              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">150</h2>
               <p className="text-center text-lg">Total Orders Today</p>
             </div>
           </Link>

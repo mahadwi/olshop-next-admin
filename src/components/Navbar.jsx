@@ -31,7 +31,7 @@ export default function Navbar() {
             <label htmlFor="my-drawer" className="drawer-overlay"></label>
             <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
               {/* Sidebar content here */}
-              <h1 class="text-2xl font-bold text-primary ">Dashboard Admin</h1>
+              <h1 className="text-2xl font-bold text-primary ">Dashboard Admin</h1>
               <li className="hover:bg-primary rounded-lg">
                 <Link href="/products">Product</Link>
               </li>
