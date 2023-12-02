@@ -7,7 +7,7 @@ export default function Page() {
   const router = useRouter();
   useEffect(() => {
     deleteCookie("adminAccessToken");
-    router.push("/admin/login");
+    router.push("/login");
   });
 
   return (
