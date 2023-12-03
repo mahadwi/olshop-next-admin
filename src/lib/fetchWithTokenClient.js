@@ -1,6 +1,5 @@
-import { deleteCookie, getCookie } from "cookies-next";
+import { getCookie } from "cookies-next";
 import BASE_URL from "./baseUrl";
-import { redirect } from "next/navigation";
 
 const fetchWithTokenClient = async (endpoint, method, options) => {
   const token = getCookie(`adminAccessToken`);
@@ -15,6 +14,7 @@ const fetchWithTokenClient = async (endpoint, method, options) => {
     headers,
     ...options,
   };
+  console.log(endpoint)
   const url = `${BASE_URL}/${endpoint}`;
   const response = await fetch(url, requestOptions);
   const data = await response.json();

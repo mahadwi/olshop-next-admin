@@ -18,16 +18,23 @@ const fetchWithTokenServer = async (endpoint, method, options) => {
 
   const url = `${BASE_URL}/${endpoint}`;
   const response = await fetch(url, requestOptions);
-  const data = await response.json();
+  const data = await response.text(); // Read the response as text
 
   if (!response.ok) {
     if (response.statusText === `Unauthorized`) {
       return `Unauthorized`;
     }
-    console.log(url, requestOptions);
-    return data.message || "Error fetching data";
+    console.log(`Error Response from ${url}:`, data); // Log the response for debugging
+    return data || "Error fetching data";
   }
 
-  return data;
+  try {
+    const jsonData = JSON.parse(data); // Attempt to parse JSON
+    return jsonData;
+  } catch (error) {
+    console.error(`JSON Parsing Error for ${url}:`, error); // Log parsing errors
+    return "Error parsing JSON";
+  }
+
 };
 export default fetchWithTokenServer;

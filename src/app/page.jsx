@@ -2,14 +2,29 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getAllCustomer } from "@/fetch/customer";
+import { getAllProduct } from "@/fetch/productCount";
+import { getAllOrder } from "@/fetch/order";
 
 export default async function Home() {
   const token = cookies().get("adminAccessToken");
-  const Customers = await getAllCustomer(token.value);
 
   if (!token) {
     redirect(`/login`);
   }
+
+  const Customers = await getAllCustomer(token.value);
+  const cusLength = Customers.data ? Customers.data.length : 0;
+
+  const resProducts = await getAllProduct(token.value);
+  const productLength = resProducts.data ? resProducts.data.length : 0;
+
+  const Order = await getAllOrder(token.value);
+  const dataOrder = Array.isArray(Order) ? Order : []; // Check if Order is an array
+
+  const todayDate = new Date().toISOString().split("T")[0];
+  const todayOrder = dataOrder.filter((order) => order.created_at.startsWith(todayDate));
+
+  const todayOrderLength =todayOrder.data ? todayOrder.length : 0;
 
   return (
     <>
@@ -45,21 +60,21 @@ export default async function Home() {
           </table>
         </div>
         <div className="w-1/4 flex flex-col justify-center items-center">
-          <Link href={"/order"}>
+          <Link href={"/customer"}>
             <div className="bg-primary text-white hover:bg-orange-400 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
-              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">100</h2>
+              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">{cusLength}</h2>
               <p className="text-center text-lg">Total User</p>
             </div>
           </Link>
-          <Link href={"/order"}>
+          <Link href={"/products"}>
             <div className="bg-primary text-white hover:bg-orange-400 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
-              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">10</h2>
-              <p className="text-center text-lg">Total Product Today</p>
+              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">{productLength}</h2>
+              <p className="text-center text-lg">Total Product</p>
             </div>
           </Link>
           <Link href={"/order"}>
             <div className="bg-primary text-white hover:bg-orange-400 w-52 h-24 mb-6 shadow-xl cursor-pointer rounded-lg overflow-hidden">
-              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">150</h2>
+              <h2 className="text-center font-semibold text-5xl leading-none pt-2 mt-2">{todayOrderLength}</h2>
               <p className="text-center text-lg">Total Orders Today</p>
             </div>
           </Link>
