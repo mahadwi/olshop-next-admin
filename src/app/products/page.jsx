@@ -1,4 +1,3 @@
-// src/app/product/page.js
 "use client";
 import { useEffect, useState } from "react";
 import AddProduct from "./components/AddProduct";
