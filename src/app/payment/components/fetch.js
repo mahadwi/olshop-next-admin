@@ -1,16 +1,16 @@
 import BASE_URL from "@/lib/baseUrl";
 
-export const getAllCustomer = async (token) => {
+export const getAllPayment = async (token) => {
   try {
-    const res = await fetch(`${BASE_URL}/user`, {
+    const res = await fetch(`${BASE_URL}/payment`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
       cache: "no-store",
     });
-    const customer = await res.json();
-    return customer;
+    const payment = await res.json();
+    return payment;
   } catch (error) {
     console.log(error);
   }
