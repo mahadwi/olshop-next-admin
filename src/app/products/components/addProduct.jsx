@@ -1,4 +1,4 @@
-//src/app/product/components/addProduct.js
+// src/app/product/components/addProduct.js
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ export default function AddProduct() {
   // State untuk menyimpan data formulir
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
+  const [productType, setProductType] = useState("");
   const [color, setColor] = useState("");
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState(0);
@@ -22,12 +23,11 @@ export default function AddProduct() {
   const [categories, setCategories] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
 
-  // Mengambil token dari cookie untuk otentikasi
-  const token = getCookie("adminAccessToken");
-
   // Menggunakan useRouter hook dari Next.js
   const router = useRouter();
 
+  // Fungsi untuk mengambil token dari cookie untuk otentikasi
+  const token = getCookie("adminAccessToken");
   const fetchCategories = async () => {
     try {
       const categoriesResponse = await fetch(`${BASE_URL}/category`, {
@@ -100,73 +100,54 @@ export default function AddProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Membuat FormData untuk pembuatan produk
-      const productFormData = new FormData();
-      productFormData.append("name", productName);
-      productFormData.append("description", description);
-      productFormData.append("category_id", category);
-      productFormData.append("warehouse_id", warehouse);
-
-      // Mengirim permintaan POST untuk membuat produk baru
-      const productResponse = await fetch(`${BASE_URL}/products`, {
+      const formData = new FormData();
+      formData.append("name", productName);
+      formData.append("description", description);
+      formData.append("type", productType);
+      formData.append("color", color);
+      formData.append("stock", stock);
+      formData.append("price", price);
+      formData.append("weight", weight);
+      formData.append("photo", imageFile);
+      formData.append("category_id", category);
+      formData.append("warehouse_id", warehouse);
+  
+      const responseData = await fetch(`${BASE_URL}/products`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: productFormData,
+        body: formData,
         cache: "no-store",
       });
-
-      // Mendapatkan data produk dari respons JSON
-      const productData = await productResponse.json();
-      const productId = productData.data.id;
-
-      // Membuat FormData untuk detail produk
-      const productDetailFormData = new FormData();
-      productDetailFormData.append("photo", imageFile);
-      productDetailFormData.append("color", color);
-      productDetailFormData.append("stock", stock);
-      productDetailFormData.append("price", price);
-      productDetailFormData.append("weight", weight);
-
-      // Mengirim permintaan POST untuk membuat detail produk
-      const productDetailResponse = await fetch(
-        `${BASE_URL}/products/details/${productId}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: productDetailFormData,
-          cache: "no-store",
-        }
-      );
-
-      // Mendapatkan data detail produk dari respons JSON
-      const productDetailResponseData = await productDetailResponse.json();
-
-      // Menampilkan pesan sukses menggunakan SweetAlert
-      Swal.fire({
-        icon: "success",
-        title: "Create Product Success",
-        text: productDetailResponseData.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-
-      // Menutup modal
-      setIsOpen(false);
-
-      // Mereset halaman menggunakan router.push
-      router.push(router.asPath);
-
-      // Mereset produk pada ProductPage
-      refreshProducts();
+  
+      if (responseData.ok) {
+        const response = await responseData.json();
+        Swal.fire({
+          icon: "success",
+          title: "Create Product Success",
+          text: response.message || "Product created successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setIsOpen(false);
+        // Menggunakan router.reload() atau router.refresh() untuk memperbarui halaman
+        router.refresh(); // atau router.refresh()
+        refreshProducts(); // Pastikan Anda memiliki fungsi refreshProducts
+      } else {
+        const errorResponse = await responseData.json();
+        console.error(`Error: ${errorResponse.error || "Unknown error"}`);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorResponse.message || "An error occurred while creating the product",
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error(`Error: ${error.message || "Unknown error"}`);
     }
   };
-
+  
   return (
     <>
       <div className="flex justify-center sm:justify-end">
@@ -199,6 +180,14 @@ export default function AddProduct() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
+                <label className="label font-bold">Type</label>
+                <input
+                  required
+                  type="text"
+                  className="input input-sm input-bordered sm:input-md"
+                  value={productType}
+                  onChange={(e) => setProductType(e.target.value)}
+                />
                 <label className="label font-bold">Color</label>
                 <input
                   required
@@ -213,7 +202,7 @@ export default function AddProduct() {
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={stock}
-                  onChange={(e) => setStock(parseInt(e.target.value))}
+                  onChange={(e) => setStock(e.target.value)}
                 />
                 <label className="label font-bold">Price</label>
                 <input
@@ -221,7 +210,7 @@ export default function AddProduct() {
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={price}
-                  onChange={(e) => setPrice(parseInt(e.target.value))}
+                  onChange={(e) => setPrice(e.target.value)}
                 />
                 <label className="label font-bold">Weight</label>
                 <input
@@ -229,7 +218,7 @@ export default function AddProduct() {
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={weight}
-                  onChange={(e) => setWeight(parseInt(e.target.value))}
+                  onChange={(e) => setWeight(e.target.value)}
                 />
                 <label className="label font-bold">Photo</label>
                 <input

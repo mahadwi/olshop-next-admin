@@ -1,28 +1,93 @@
-// src/app/product/components/EditDeleteProduct.jsx
+// src/app/product/components/EditDeleteProduct.js
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import BASE_URL from "@/lib/baseUrl";
+import { getCookie } from "cookies-next";
 
 export default function EditDeleteProduct({ product, refreshProducts }) {
+  const token = getCookie("adminAccessToken");
+
   const [isOpen, setIsOpen] = useState(false);
+
   const [productName, setProductName] = useState(product.name);
   const [description, setDescription] = useState(product.description);
+  const [type, setType] = useState(product.type);
   const [color, setColor] = useState(product.product_detail[0].color);
-  const [stock, setStock] = useState(product.product_detail[0].stock);
-  const [price, setPrice] = useState(product.product_detail[0].price);
-  const [weight, setWeight] = useState(product.product_detail[0].weight);
+  const [stock, setStock] = useState(Number.isFinite(product.product_detail[0].stock)? product.product_detail[0].stock: 0);
+  const [price, setPrice] = useState(Number.isFinite(product.product_detail[0].price)? product.product_detail[0].price: 0);
+  const [weight, setWeight] = useState(Number.isFinite(product.product_detail[0].weight)? product.product_detail[0].weight: 0);
+  const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(
     product.product_detail[0].photo
   );
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [warehouseOptions, setWarehouseOptions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(
+    product.product_detail[0].category_id
+  );
+  const [selectedWarehouse, setSelectedWarehouse] = useState(
+    product.product_detail[0].warehouse_id
+  );
+
+  useEffect(() => {
+    fetchCategoryOptions();
+    fetchWarehouseOptions();
+  }, []);
+
+  const fetchCategoryOptions = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/category`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch categories: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setCategoryOptions(data.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error.message);
+    }
+  };
+
+  const fetchWarehouseOptions = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/warehouse`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch warehouses: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setWarehouseOptions(data.data);
+    } catch (error) {
+      console.error("Error fetching warehouses:", error.message);
+    }
+  };
+
+  const handleModal = () => {
+    setIsOpen(!isOpen);
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    setImageFile(file);
 
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
     };
+
     if (file) {
       reader.readAsDataURL(file);
     }
@@ -30,68 +95,55 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+  
+    const formData = new FormData();
+    formData.append("name", productName);
+    formData.append("description", description);
+    formData.append("type", type);
+    formData.append("color", color);
+    formData.append("stock", parseInt(stock));
+    formData.append("price", parseInt(price));
+    formData.append("weight", parseInt(weight));
+    formData.append("photo", imageFile);
+    formData.append("category_id", selectedCategory);
+    formData.append("warehouse_id", selectedWarehouse);
+  
     try {
-      const productFormData = new FormData();
-      productFormData.append("name", productName);
-      productFormData.append("description", description);
-
-      const productResponse = await fetch(
-        `${BASE_URL}/products/${product.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: productFormData,
-          cache: "no-store",
-        }
-      );
-
-      const productData = await productResponse.json();
-      const productId = productData.data.id;
-
-      const updatedProductDetail = {
-        color: color,
-        stock: stock,
-        price: price,
-        weight: weight,
-      };
-
-      const productDetailFormData = new FormData();
-      productDetailFormData.append("photo", e.target.files[0]);
-      productDetailFormData.append(
-        "data",
-        JSON.stringify(updatedProductDetail)
-      );
-
-      const productDetailResponse = await fetch(
-        `${BASE_URL}/products/details/${productId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: productDetailFormData,
-          cache: "no-store",
-        }
-      );
-
-      const productDetailResponseData = await productDetailResponse.json();
-
-      Swal.fire({
-        icon: "success",
-        title: "Update Product Success",
-        text: productDetailResponseData.message,
-        showConfirmButton: false,
-        timer: 1500,
+      const response = await fetch(`${BASE_URL}/products/${product.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
       });
-
-      setIsOpen(false);
-      refreshProducts();
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        Swal.fire({
+          icon: "success",
+          title: "Update Product Success",
+          text: responseData.message || "Product updated successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setIsOpen(false);
+  
+        // Memanggil refreshProducts setelah update berhasil
+        refreshProducts();
+      } else {
+        const errorResponse = await response.json();
+        console.error(`Error: ${errorResponse.error || "Unknown error"}`);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorResponse.message || "An error occurred while updating the product",
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error(`Error: ${error.message || "Unknown error"}`);
     }
   };
+  
 
   const handleDelete = async () => {
     try {
@@ -100,41 +152,36 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        cache: "no-store",
       });
 
       if (response.ok) {
+        const responseData = await response.json();
         Swal.fire({
           icon: "success",
           title: "Delete Product Success",
-          text: "The product has been deleted successfully.",
+          text: responseData.message || "Product deleted successfully",
           showConfirmButton: false,
           timer: 1500,
         });
-
         refreshProducts();
       } else {
-        const errorData = await response.json();
+        const errorResponse = await response.json();
+        console.error(`Error: ${errorResponse.error || "Unknown error"}`);
         Swal.fire({
           icon: "error",
-          title: "Delete Product Failed",
+          title: "Error",
           text:
-            errorData.error ||
-            "Failed to delete the product. Please try again.",
+            errorResponse.message || "An error occurred while deleting the product",
         });
       }
     } catch (error) {
-      console.error(error);
+      console.error(`Error: ${error.message || "Unknown error"}`);
     }
-  };
-
-  const handleModal = () => {
-    setIsOpen(!isOpen);
   };
 
   return (
     <>
-      <div className="flex justify-center items-center sm:justify-end">
+      <div className="flex justify-center items-center">
         <button
           className="btn btn-sm btn-outline btn-orange-600 mb-5 sm:btn-md"
           onClick={handleModal}
@@ -163,6 +210,14 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
                   className="input input-sm input-bordered sm:input-md"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                />
+                <label className="label font-bold">Type</label>
+                <input
+                  required
+                  type="text"
+                  className="input input-sm input-bordered sm:input-md"
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
                 />
                 <label className="label font-bold">Color</label>
                 <input
@@ -212,6 +267,34 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
                     />
                   </div>
                 )}
+                <label className="label font-bold">Category</label>
+                <select
+                  required
+                  className="input input-sm input-bordered sm:input-md"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="">Select Category</option>
+                  {categoryOptions.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.category_name}
+                    </option>
+                  ))}
+                </select>
+                <label className="label font-bold">Warehouse</label>
+                <select
+                  required
+                  className="input input-sm input-bordered sm:input-md"
+                  value={selectedWarehouse}
+                  onChange={(e) => setSelectedWarehouse(e.target.value)}
+                >
+                  <option value="">Select Warehouse</option>
+                  {warehouseOptions.map((warehouse) => (
+                    <option key={warehouse.id} value={warehouse.id}>
+                      {warehouse.warehouse_name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="modal-action flex justify-center sm:justify-end w-full mt-6">
                 <button
@@ -224,7 +307,6 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
                 <button
                   type="submit"
                   className="btn btn-sm sm:btn-md btn-orange-600"
-                  onClick={handleUpdate}
                 >
                   Update
                 </button>

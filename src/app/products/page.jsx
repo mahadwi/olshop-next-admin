@@ -16,33 +16,48 @@ export default function ProductPage() {
     try {
       const response = await fetch(`${BASE_URL}/products`);
       const data = await response.json();
-  
+
       if (response.ok) {
         setProducts(data.data);
       } else {
-        // Handle error more gracefully, e.g., display an error message to the user
-        console.error(data.error || "Terjadi kesalahan saat mengambil data produk");
+        console.error(
+          data.error || "Terjadi kesalahan saat mengambil data produk"
+        );
       }
     } catch (error) {
-      // Handle error more gracefully, e.g., display an error message to the user
       console.error("Error fetching products:", error);
     }
   };
 
-  const refreshProducts = () => {
-    fetchProducts();
+  const refreshProducts = async () => {
+    try {
+      // Mengambil data produk terbaru dari server
+      const response = await fetch(`${BASE_URL}/products`);
+      const data = await response.json();
+
+      if (response.ok) {
+        // Menempatkan produk terbaru di awal array produk
+        setProducts([data.data, ...products]);
+      } else {
+        console.error(
+          data.error || "Terjadi kesalahan saat mengambil data produk"
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
   };
 
   return (
     <div className="flex flex-col items-center py-5 h-screen">
       <div className="w-3/4">
-        <h1 className="text-4xl font-bold text-center mb-10 text-orange-600">
+        <h1 className="text-4xl font-bold text-center  text-orange-600">
           Product List
         </h1>
         <div className="mb-5">
           <AddProduct refreshProducts={refreshProducts} />
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto mb-20">
           <table className="table-auto w-full border-collapse border border-orange-900">
             <thead>
               <tr className="bg-orange-900 text-white">
@@ -80,14 +95,14 @@ export default function ProductPage() {
                   <td className="py-2 px-4 border">
                     {product.product_detail[0].weight}
                   </td>
-                  <td className="py-2 px-4 border">
+                  <td className="py-2 px-4 border text-center">
                     <img
-                      src={product.product_detail[0].photo}
+                      src={product.product_detail[0].photo || null}
                       alt={`Product ${product.name}`}
-                      className="w-8 h-8 object-cover rounded"
+                      className="w-16 h-16 object-cover rounded mx-auto" // Menyesuaikan ukuran dan menempatkan gambar di tengah
                     />
                   </td>
-                  <td className="py-2 px-4 border">
+                  <td className="py-2 px-4 border text-center">
                     <EditDeleteProduct
                       product={product}
                       refreshProducts={refreshProducts}

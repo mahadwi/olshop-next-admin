@@ -90,6 +90,7 @@ const OrderPage = () => {
                 <th className="py-2 px-4 border">Address</th>
                 <th className="py-2 px-4 border">Payment Method ID</th>
                 <th className="py-2 px-4 border">Total Price</th>
+                <th className="py-2 px-4 border">Action</th>
                 <th className="py-2 px-4 border">Status</th>
               </tr>
             </thead>
@@ -107,11 +108,13 @@ const OrderPage = () => {
                       value={order.order_status[0].status}
                       onChange={(e) => handleSelectChange(order.id, e)}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
+                      <option value="Waiting Payment">Waiting Payment</option>
+                      <option value="Process">Process</option>
+                      <option value="Waiting Courier">Waiting Courier</option>
+                      <option value="Arrived">Arrived</option>
                     </select>
                   </td>
+                  <th className="py-2 px-4 border">{order.order_status[0].status}</th>
                 </tr>
               ))}
             </tbody>
