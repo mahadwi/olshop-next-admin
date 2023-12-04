@@ -29,24 +29,10 @@ export default function ProductPage() {
     }
   };
 
-  const refreshProducts = async () => {
-    try {
-      // Mengambil data produk terbaru dari server
-      const response = await fetch(`${BASE_URL}/products`);
-      const data = await response.json();
-
-      if (response.ok) {
-        // Menempatkan produk terbaru di awal array produk
-        setProducts([data.data, ...products]);
-      } else {
-        console.error(
-          data.error || "Terjadi kesalahan saat mengambil data produk"
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
+  const refreshProducts = () => {
+    fetchProducts();
   };
+
 
   return (
     <div className="flex flex-col items-center py-5 h-screen">
