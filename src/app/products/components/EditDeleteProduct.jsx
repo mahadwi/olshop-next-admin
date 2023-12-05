@@ -95,7 +95,16 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-  
+
+    if (stock < 0 || price < 0 || weight < 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Input',
+        text: 'Stock, price, and weight cannot be negative',
+      });
+      return;
+    }
+    
     const formData = new FormData();
     formData.append("name", productName);
     formData.append("description", description);

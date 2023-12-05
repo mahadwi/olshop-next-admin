@@ -6,8 +6,7 @@ import BASE_URL from "@/lib/baseUrl";
 import { getCookie } from "cookies-next";
 import Swal from "sweetalert2";
 
-export default function AddProduct() {
-  // State untuk menyimpan data formulir
+export default function AddProduct({ refreshProducts }) {
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [productType, setProductType] = useState("");
@@ -23,11 +22,9 @@ export default function AddProduct() {
   const [categories, setCategories] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
 
-  // Menggunakan useRouter hook dari Next.js
   const router = useRouter();
-
-  // Fungsi untuk mengambil token dari cookie untuk otentikasi
   const token = getCookie("adminAccessToken");
+
   const fetchCategories = async () => {
     try {
       const categoriesResponse = await fetch(`${BASE_URL}/category`, {
@@ -77,12 +74,10 @@ export default function AddProduct() {
     fetchWarehouses();
   }, []);
 
-  // Fungsi untuk membuka dan menutup modal
   const handleModal = () => {
     setIsOpen(!isOpen);
   };
 
-  // Mengelola perubahan gambar dan menampilkan pratinjau
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
@@ -96,7 +91,21 @@ export default function AddProduct() {
     }
   };
 
-  // Mengelola pengiriman formulir
+  const handleStockChange = (e) => {
+    const newValue = parseInt(e.target.value, 10);
+    setStock(newValue >= 0 ? newValue : 0);
+  };
+
+  const handlePriceChange = (e) => {
+    const newValue = parseInt(e.target.value, 10);
+    setPrice(newValue >= 0 ? newValue : 0);
+  };
+
+  const handleWeightChange = (e) => {
+    const newValue = parseInt(e.target.value, 10);
+    setWeight(newValue >= 0 ? newValue : 0);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -111,7 +120,7 @@ export default function AddProduct() {
       formData.append("photo", imageFile);
       formData.append("category_id", category);
       formData.append("warehouse_id", warehouse);
-  
+
       const responseData = await fetch(`${BASE_URL}/products`, {
         method: "POST",
         headers: {
@@ -120,7 +129,7 @@ export default function AddProduct() {
         body: formData,
         cache: "no-store",
       });
-  
+
       if (responseData.ok) {
         const response = await responseData.json();
         Swal.fire({
@@ -131,9 +140,8 @@ export default function AddProduct() {
           timer: 1500,
         });
         setIsOpen(false);
-        // Menggunakan router.reload() atau router.refresh() untuk memperbarui halaman
-        router.refresh(); // atau router.refresh()
-        refreshProducts(); // Pastikan Anda memiliki fungsi refreshProducts
+        router.refresh();
+        refreshProducts();
       } else {
         const errorResponse = await responseData.json();
         console.error(`Error: ${errorResponse.error || "Unknown error"}`);
@@ -202,7 +210,7 @@ export default function AddProduct() {
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={stock}
-                  onChange={(e) => setStock(e.target.value)}
+                  onChange={handleStockChange}
                 />
                 <label className="label font-bold">Price</label>
                 <input
@@ -210,15 +218,16 @@ export default function AddProduct() {
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={handlePriceChange}
                 />
+
                 <label className="label font-bold">Weight</label>
                 <input
                   required
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
+                  onChange={handleWeightChange}
                 />
                 <label className="label font-bold">Photo</label>
                 <input
@@ -233,7 +242,7 @@ export default function AddProduct() {
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="image-preview"
+                      className="image-preview w-full h-auto"
                     />
                   </div>
                 )}
