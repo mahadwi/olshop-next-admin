@@ -7,10 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        'zebra-odd': 'your-color-here', 
+        'zebra-even': "#ec600b", 
       },
     },
   },
@@ -19,22 +18,14 @@ module.exports = {
     themes: [
       {
         mytheme: {
-          primary: "#2D5B76",
-
+          primary: "#ec600b",
           secondary: "#ffff",
-
           accent: "#E9AC6C",
-
           neutral: "#568995",
-
           "base-100": "#f6f6f6",
-
           info: "#0ca6e9",
-
           success: "#2bd4bd",
-
           warning: "#f4c152",
-
           error: "#d80032",
         },
       },

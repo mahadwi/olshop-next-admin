@@ -1,4 +1,3 @@
-// src/app/product/page.js
 "use client";
 import { useEffect, useState } from "react";
 import AddProduct from "./components/AddProduct";
@@ -37,9 +36,7 @@ export default function ProductPage() {
   return (
     <div className="flex flex-col items-center py-5 h-screen">
       <div className="w-3/4">
-        <h1 className="text-4xl font-bold text-center  text-orange-600">
-          Product List
-        </h1>
+        <h1 className="text-4xl font-bold text-center mb-10 text-orange-600">Product List</h1>
         <div className="mb-5">
           <AddProduct refreshProducts={refreshProducts} />
         </div>
@@ -60,15 +57,14 @@ export default function ProductPage() {
             </thead>
             <tbody>
               {products.map((product, index) => (
-                <tr
-                  key={product.id}
-                  className={
-                    (index + 1) % 2 === 0 ? "bg-orange-100" : "bg-white"
-                  }
-                >
+                <tr key={product.id} className={(index + 1) % 2 === 0 ? "bg-orange-100" : "bg-white"}>
                   <td className="py-2 px-4 border">{index + 1}</td>
                   <td className="py-2 px-4 border">{product.name}</td>
                   <td className="py-2 px-4 border">{product.description}</td>
+                  <td className="py-2 px-4 border">{product.product_detail[0].color}</td>
+                  <td className="py-2 px-4 border">{product.product_detail[0].stock}</td>
+                  <td className="py-2 px-4 border">{product.product_detail[0].price}</td>
+                  <td className="py-2 px-4 border">{product.product_detail[0].weight}</td>
                   <td className="py-2 px-4 border">
                     {product.product_detail[0].color}
                   </td>
