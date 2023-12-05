@@ -19,11 +19,11 @@ export default function ProductPage() {
       if (response.ok) {
         setProducts(data.data);
       } else {
-        // Handle error more gracefully, e.g., display an error message to the user
-        console.error(data.error || "Terjadi kesalahan saat mengambil data produk");
+        console.error(
+          data.error || "Terjadi kesalahan saat mengambil data produk"
+        );
       }
     } catch (error) {
-      // Handle error more gracefully, e.g., display an error message to the user
       console.error("Error fetching products:", error);
     }
   };
@@ -32,6 +32,7 @@ export default function ProductPage() {
     fetchProducts();
   };
 
+
   return (
     <div className="flex flex-col items-center py-5 h-screen">
       <div className="w-3/4">
@@ -39,7 +40,7 @@ export default function ProductPage() {
         <div className="mb-5">
           <AddProduct refreshProducts={refreshProducts} />
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto mb-20">
           <table className="table-auto w-full border-collapse border border-orange-900">
             <thead>
               <tr className="bg-orange-900 text-white">
@@ -65,10 +66,29 @@ export default function ProductPage() {
                   <td className="py-2 px-4 border">{product.product_detail[0].price}</td>
                   <td className="py-2 px-4 border">{product.product_detail[0].weight}</td>
                   <td className="py-2 px-4 border">
-                    <img src={product.product_detail[0].photo} alt={`Product ${product.name}`} className="w-8 h-8 object-cover rounded" />
+                    {product.product_detail[0].color}
                   </td>
                   <td className="py-2 px-4 border">
-                    <EditDeleteProduct product={product} refreshProducts={refreshProducts} />
+                    {product.product_detail[0].stock}
+                  </td>
+                  <td className="py-2 px-4 border">
+                    {product.product_detail[0].price}
+                  </td>
+                  <td className="py-2 px-4 border">
+                    {product.product_detail[0].weight}
+                  </td>
+                  <td className="py-2 px-4 border text-center">
+                    <img
+                      src={product.product_detail[0].photo || null}
+                      alt={`Product ${product.name}`}
+                      className="w-16 h-16 object-cover rounded mx-auto" // Menyesuaikan ukuran dan menempatkan gambar di tengah
+                    />
+                  </td>
+                  <td className="py-2 px-4 border text-center">
+                    <EditDeleteProduct
+                      product={product}
+                      refreshProducts={refreshProducts}
+                    />
                   </td>
                 </tr>
               ))}
