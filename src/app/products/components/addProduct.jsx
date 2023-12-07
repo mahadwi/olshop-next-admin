@@ -121,7 +121,6 @@ export default function AddProduct({ refreshProducts }) {
       formData.append("photo", imageFile);
       formData.append("category_id", category);
       formData.append("warehouse_id", warehouse);
-  
       const responseData = await fetch(`${BASE_URL}/products/admin`, {
         method: "POST",
         headers: {
@@ -130,7 +129,6 @@ export default function AddProduct({ refreshProducts }) {
         body: formData,
         cache: "no-store",
       });
-  
       if (responseData.ok) {
         const response = await responseData.json();
         Swal.fire({
@@ -140,7 +138,6 @@ export default function AddProduct({ refreshProducts }) {
           showConfirmButton: false,
           timer: 1500,
         });
-  
         // Reset the form fields after successful submission
         setProductName("");
         setDescription("");
@@ -153,7 +150,6 @@ export default function AddProduct({ refreshProducts }) {
         setCategory("");
         setWarehouse("");
         setImagePreview("");
-  
         setIsOpen(false);
         router.refresh();
         refreshProducts();
@@ -170,7 +166,6 @@ export default function AddProduct({ refreshProducts }) {
       console.error(`Error: ${error.message || "Unknown error"}`);
     }
   };
-  
   
   return (
     <>

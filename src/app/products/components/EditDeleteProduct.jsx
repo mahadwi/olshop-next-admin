@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 // src/app/product/components/EditDeleteProduct.js
 "use client";
 import { useState, useEffect } from "react";
