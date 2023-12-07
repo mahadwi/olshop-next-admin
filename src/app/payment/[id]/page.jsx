@@ -1,6 +1,4 @@
 import fetchWithTokenServer from "@/lib/fetchWithTokenServer";
-
-// import { getCookies } from "cookies-next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Upload from "./components/Upload";

@@ -37,7 +37,7 @@ export default async function Home() {
 
       <div className="container mx-auto flex">
         <div className="w-3/4">
-          <h1 className="text-3xl font-bold mb-4">Last User Order</h1>
+          <h1 className="text-3xl font-bold mb-4">Last User Register</h1>
           <table className="table table-zebra table-sm md:w-3/4">
             <thead>
               <tr>

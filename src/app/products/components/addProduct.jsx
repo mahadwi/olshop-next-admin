@@ -1,15 +1,16 @@
-//src/app/product/components/addProduct.js
+// src/app/product/components/addProduct.js
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BASE_URL from "@/lib/baseUrl";
 import { getCookie } from "cookies-next";
 import Swal from "sweetalert2";
+import Image from "next/image";
 
-export default function AddProduct() {
-  // State untuk menyimpan data formulir
+export default function AddProduct({ refreshProducts }) {
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
+  const [productType, setProductType] = useState("");
   const [color, setColor] = useState("");
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState(0);
@@ -22,11 +23,8 @@ export default function AddProduct() {
   const [categories, setCategories] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
 
-  // Mengambil token dari cookie untuk otentikasi
-  const token = getCookie("adminAccessToken");
-
-  // Menggunakan useRouter hook dari Next.js
   const router = useRouter();
+  const token = getCookie("adminAccessToken");
 
   const fetchCategories = async () => {
     try {
@@ -77,12 +75,10 @@ export default function AddProduct() {
     fetchWarehouses();
   }, []);
 
-  // Fungsi untuk membuka dan menutup modal
   const handleModal = () => {
     setIsOpen(!isOpen);
   };
 
-  // Mengelola perubahan gambar dan menampilkan pratinjau
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
@@ -96,77 +92,86 @@ export default function AddProduct() {
     }
   };
 
-  // Mengelola pengiriman formulir
+  const handleStockChange = (e) => {
+    const newValue = parseInt(e.target.value, 10);
+    setStock(newValue >= 0 ? newValue : 0);
+  };
+
+  const handlePriceChange = (e) => {
+    const newValue = parseInt(e.target.value, 10);
+    setPrice(newValue >= 0 ? newValue : 0);
+  };
+
+  const handleWeightChange = (e) => {
+    const newValue = parseInt(e.target.value, 10);
+    setWeight(newValue >= 0 ? newValue : 0);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Membuat FormData untuk pembuatan produk
-      const productFormData = new FormData();
-      productFormData.append("name", productName);
-      productFormData.append("description", description);
-      productFormData.append("category_id", category);
-      productFormData.append("warehouse_id", warehouse);
-
-      // Mengirim permintaan POST untuk membuat produk baru
-      const productResponse = await fetch(`${BASE_URL}/products`, {
+      const formData = new FormData();
+      formData.append("name", productName);
+      formData.append("description", description);
+      formData.append("type", productType);
+      formData.append("color", color);
+      formData.append("stock", stock);
+      formData.append("price", price);
+      formData.append("weight", weight);
+      formData.append("photo", imageFile);
+      formData.append("category_id", category);
+      formData.append("warehouse_id", warehouse);
+  
+      const responseData = await fetch(`${BASE_URL}/products/admin`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: productFormData,
+        body: formData,
         cache: "no-store",
       });
-
-      // Mendapatkan data produk dari respons JSON
-      const productData = await productResponse.json();
-      const productId = productData.data.id;
-
-      // Membuat FormData untuk detail produk
-      const productDetailFormData = new FormData();
-      productDetailFormData.append("photo", imageFile);
-      productDetailFormData.append("color", color);
-      productDetailFormData.append("stock", stock);
-      productDetailFormData.append("price", price);
-      productDetailFormData.append("weight", weight);
-
-      // Mengirim permintaan POST untuk membuat detail produk
-      const productDetailResponse = await fetch(
-        `${BASE_URL}/products/details/${productId}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: productDetailFormData,
-          cache: "no-store",
-        }
-      );
-
-      // Mendapatkan data detail produk dari respons JSON
-      const productDetailResponseData = await productDetailResponse.json();
-
-      // Menampilkan pesan sukses menggunakan SweetAlert
-      Swal.fire({
-        icon: "success",
-        title: "Create Product Success",
-        text: productDetailResponseData.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-
-      // Menutup modal
-      setIsOpen(false);
-
-      // Mereset halaman menggunakan router.push
-      router.push(router.asPath);
-
-      // Mereset produk pada ProductPage
-      refreshProducts();
+  
+      if (responseData.ok) {
+        const response = await responseData.json();
+        Swal.fire({
+          icon: "success",
+          title: "Create Product Success",
+          text: response.message || "Product created successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+  
+        // Reset the form fields after successful submission
+        setProductName("");
+        setDescription("");
+        setProductType("");
+        setColor("");
+        setStock(0);
+        setPrice(0);
+        setWeight(0);
+        setImageFile(null);
+        setCategory("");
+        setWarehouse("");
+        setImagePreview("");
+  
+        setIsOpen(false);
+        router.refresh();
+        refreshProducts();
+      } else {
+        const errorResponse = await responseData.json();
+        console.error(`Error: ${errorResponse.error || "Unknown error"}`);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorResponse.message || "An error occurred while creating the product",
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error(`Error: ${error.message || "Unknown error"}`);
     }
   };
-
+  
+  
   return (
     <>
       <div className="flex justify-center sm:justify-end">
@@ -199,6 +204,14 @@ export default function AddProduct() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
+                <label className="label font-bold">Type</label>
+                <input
+                  required
+                  type="text"
+                  className="input input-sm input-bordered sm:input-md"
+                  value={productType}
+                  onChange={(e) => setProductType(e.target.value)}
+                />
                 <label className="label font-bold">Color</label>
                 <input
                   required
@@ -213,7 +226,7 @@ export default function AddProduct() {
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={stock}
-                  onChange={(e) => setStock(parseInt(e.target.value))}
+                  onChange={handleStockChange}
                 />
                 <label className="label font-bold">Price</label>
                 <input
@@ -221,15 +234,16 @@ export default function AddProduct() {
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={price}
-                  onChange={(e) => setPrice(parseInt(e.target.value))}
+                  onChange={handlePriceChange}
                 />
+
                 <label className="label font-bold">Weight</label>
                 <input
                   required
                   type="number"
                   className="input input-sm input-bordered sm:input-md"
                   value={weight}
-                  onChange={(e) => setWeight(parseInt(e.target.value))}
+                  onChange={handleWeightChange}
                 />
                 <label className="label font-bold">Photo</label>
                 <input
@@ -241,10 +255,10 @@ export default function AddProduct() {
                 />
                 {imagePreview && (
                   <div className="image-preview-container">
-                    <img
+                    <Image
                       src={imagePreview}
                       alt="Preview"
-                      className="image-preview"
+                      className="image-preview w-full h-auto"
                     />
                   </div>
                 )}

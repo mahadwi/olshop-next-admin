@@ -1,4 +1,4 @@
-// src/app/product/page.js
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useEffect, useState } from "react";
 import AddProduct from "./components/AddProduct";
@@ -20,11 +20,11 @@ export default function ProductPage() {
       if (response.ok) {
         setProducts(data.data);
       } else {
-        // Handle error more gracefully, e.g., display an error message to the user
-        console.error(data.error || "Terjadi kesalahan saat mengambil data produk");
+        console.error(
+          data.error || "Terjadi kesalahan saat mengambil data produk"
+        );
       }
     } catch (error) {
-      // Handle error more gracefully, e.g., display an error message to the user
       console.error("Error fetching products:", error);
     }
   };
@@ -33,6 +33,7 @@ export default function ProductPage() {
     fetchProducts();
   };
 
+
   return (
     <div className="flex flex-col items-center py-5 h-screen">
       <div className="w-3/4">
@@ -40,7 +41,7 @@ export default function ProductPage() {
         <div className="mb-5">
           <AddProduct refreshProducts={refreshProducts} />
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto mb-20">
           <table className="table-auto w-full border-collapse border border-orange-900">
             <thead>
               <tr className="bg-orange-900 text-white">
@@ -48,9 +49,9 @@ export default function ProductPage() {
                 <th className="py-2 px-4 border">Product Name</th>
                 <th className="py-2 px-4 border">Description</th>
                 <th className="py-2 px-4 border">Color</th>
-                <th className="py-2 px-4 border">Stock</th>
-                <th className="py-2 px-4 border">Price</th>
-                <th className="py-2 px-4 border">Weight</th>
+                <th className="py-2 px-4 border">Stock (PCS)</th>
+                <th className="py-2 px-4 border">Price (IDR)</th>
+                <th className="py-2 px-4 border">Weight (GRAM)</th>
                 <th className="py-2 px-4 border">Image</th>
                 <th className="py-2 px-4 border">Edit/Delete</th>
               </tr>
@@ -65,11 +66,18 @@ export default function ProductPage() {
                   <td className="py-2 px-4 border">{product.product_detail[0].stock}</td>
                   <td className="py-2 px-4 border">{product.product_detail[0].price}</td>
                   <td className="py-2 px-4 border">{product.product_detail[0].weight}</td>
-                  <td className="py-2 px-4 border">
-                    <img src={product.product_detail[0].photo} alt={`Product ${product.name}`} className="w-8 h-8 object-cover rounded" />
+                  <td className="py-2 px-4 border text-center">
+                    <img
+                      src={product.product_detail[0].photo || null}
+                      alt={`Product ${product.name}`}
+                      className="w-16 h-16 object-cover rounded mx-auto" // Menyesuaikan ukuran dan menempatkan gambar di tengah
+                    />
                   </td>
-                  <td className="py-2 px-4 border">
-                    <EditDeleteProduct product={product} refreshProducts={refreshProducts} />
+                  <td className="py-2 px-4 border text-center">
+                    <EditDeleteProduct
+                      product={product}
+                      refreshProducts={refreshProducts}
+                    />
                   </td>
                 </tr>
               ))}
