@@ -118,7 +118,7 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
     formData.append("warehouse_id", selectedWarehouse);
   
     try {
-      const response = await fetch(`${BASE_URL}/products/${product.id}`, {
+      const response = await fetch(`${BASE_URL}/products/admin/${product.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -156,7 +156,7 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/products/${product.id}`, {
+      const response = await fetch(`${BASE_URL}/products/admin/${product.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

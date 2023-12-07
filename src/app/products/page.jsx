@@ -48,9 +48,9 @@ export default function ProductPage() {
                 <th className="py-2 px-4 border">Product Name</th>
                 <th className="py-2 px-4 border">Description</th>
                 <th className="py-2 px-4 border">Color</th>
-                <th className="py-2 px-4 border">Stock</th>
-                <th className="py-2 px-4 border">Price</th>
-                <th className="py-2 px-4 border">Weight</th>
+                <th className="py-2 px-4 border">Stock (PCS)</th>
+                <th className="py-2 px-4 border">Price (IDR)</th>
+                <th className="py-2 px-4 border">Weight (GRAM)</th>
                 <th className="py-2 px-4 border">Image</th>
                 <th className="py-2 px-4 border">Edit/Delete</th>
               </tr>
@@ -65,18 +65,6 @@ export default function ProductPage() {
                   <td className="py-2 px-4 border">{product.product_detail[0].stock}</td>
                   <td className="py-2 px-4 border">{product.product_detail[0].price}</td>
                   <td className="py-2 px-4 border">{product.product_detail[0].weight}</td>
-                  <td className="py-2 px-4 border">
-                    {product.product_detail[0].color}
-                  </td>
-                  <td className="py-2 px-4 border">
-                    {product.product_detail[0].stock}
-                  </td>
-                  <td className="py-2 px-4 border">
-                    {product.product_detail[0].price}
-                  </td>
-                  <td className="py-2 px-4 border">
-                    {product.product_detail[0].weight}
-                  </td>
                   <td className="py-2 px-4 border text-center">
                     <img
                       src={product.product_detail[0].photo || null}

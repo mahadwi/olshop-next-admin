@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import BASE_URL from "@/lib/baseUrl";
 import { getCookie } from "cookies-next";
 import Swal from "sweetalert2";
+import Image from "next/image";
 
 export default function AddProduct({ refreshProducts }) {
   const [productName, setProductName] = useState("");
@@ -120,8 +121,7 @@ export default function AddProduct({ refreshProducts }) {
       formData.append("photo", imageFile);
       formData.append("category_id", category);
       formData.append("warehouse_id", warehouse);
-
-      const responseData = await fetch(`${BASE_URL}/products`, {
+      const responseData = await fetch(`${BASE_URL}/products/admin`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,7 +129,6 @@ export default function AddProduct({ refreshProducts }) {
         body: formData,
         cache: "no-store",
       });
-
       if (responseData.ok) {
         const response = await responseData.json();
         Swal.fire({
@@ -139,6 +138,18 @@ export default function AddProduct({ refreshProducts }) {
           showConfirmButton: false,
           timer: 1500,
         });
+        // Reset the form fields after successful submission
+        setProductName("");
+        setDescription("");
+        setProductType("");
+        setColor("");
+        setStock(0);
+        setPrice(0);
+        setWeight(0);
+        setImageFile(null);
+        setCategory("");
+        setWarehouse("");
+        setImagePreview("");
         setIsOpen(false);
         router.refresh();
         refreshProducts();
@@ -239,7 +250,7 @@ export default function AddProduct({ refreshProducts }) {
                 />
                 {imagePreview && (
                   <div className="image-preview-container">
-                    <img
+                    <Image
                       src={imagePreview}
                       alt="Preview"
                       className="image-preview w-full h-auto"

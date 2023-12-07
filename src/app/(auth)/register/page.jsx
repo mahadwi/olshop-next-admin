@@ -44,7 +44,7 @@ export default function Page() {
             Sign Up
           </h1>
           <p className="w-80 text-center text-sm mb-8 font-semibold text-gray-700 tracking-wide cursor-pointer">
-            Create an admin account for enhanced privileges.
+            Create an admin account for access admin dashboard.
           </p>
         </div>
         <div className="space-y-4">
