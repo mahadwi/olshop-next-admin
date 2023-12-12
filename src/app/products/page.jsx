@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import AddProduct from "./components/AddProduct";
+import AddProduct from "./components/addProduct";
 import EditDeleteProduct from "./components/EditDeleteProduct";
 import BASE_URL from "@/lib/baseUrl";
 
