@@ -29,7 +29,8 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody>
-              {Payments.data.map((payment, index) => (
+            {Payments.data && Payments.data.length > 0 ? (
+              Payments.data.map((payment, index) => (
                 <tr key={payment.id}>
                   <td className="hidden sm:block">{index + 1}</td>
                   <td>{payment.order_id}</td>
@@ -60,7 +61,12 @@ export default async function Page() {
                       </Link>
                     </td>
                 </tr>
-              ))}
+              ))
+              ) : (
+                <tr>
+                  <td colSpan="3">Tidak ada data pembayaran.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
