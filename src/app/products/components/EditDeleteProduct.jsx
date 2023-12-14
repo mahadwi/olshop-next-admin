@@ -1,9 +1,10 @@
 // src/app/product/components/EditDeleteProduct.js
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import BASE_URL from "@/lib/baseUrl";
 import { getCookie } from "cookies-next";
+import Image from "next/image";
 
 export default function EditDeleteProduct({ product, refreshProducts }) {
   const token = getCookie("adminAccessToken");
@@ -33,9 +34,9 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
   useEffect(() => {
     fetchCategoryOptions();
     fetchWarehouseOptions();
-  }, []);
+  }, [fetchCategoryOptions, fetchWarehouseOptions]);
 
-  const fetchCategoryOptions = async () => {
+  const fetchCategoryOptions = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/category`, {
         method: "GET",
@@ -53,9 +54,9 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
     } catch (error) {
       console.error("Error fetching categories:", error.message);
     }
-  };
+  }, [token]);
 
-  const fetchWarehouseOptions = async () => {
+  const fetchWarehouseOptions = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/warehouse`, {
         method: "GET",
@@ -73,7 +74,7 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
     } catch (error) {
       console.error("Error fetching warehouses:", error.message);
     }
-  };
+  }, [token]);
 
   const handleModal = () => {
     setIsOpen(!isOpen);
@@ -269,7 +270,7 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
                 />
                 {imagePreview && (
                   <div className="image-preview-container">
-                    <img
+                    <Image
                       src={imagePreview}
                       alt="Preview"
                       className="image-preview w-full h-auto"

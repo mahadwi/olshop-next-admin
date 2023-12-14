@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import AddProduct from "./components/addProduct";
 import EditDeleteProduct from "./components/EditDeleteProduct";
 import BASE_URL from "@/lib/baseUrl";
+import Image from "next/image";
 
 export default function ProductPage() {
   const [products, setProducts] = useState([]);
@@ -66,7 +67,7 @@ export default function ProductPage() {
                   <td className="py-2 px-4 border">{product.product_detail[0].price}</td>
                   <td className="py-2 px-4 border">{product.product_detail[0].weight}</td>
                   <td className="py-2 px-4 border text-center">
-                    <img
+                    <Image
                       src={product.product_detail[0].photo || null}
                       alt={`Product ${product.name}`}
                       className="w-16 h-16 object-cover rounded mx-auto" // Menyesuaikan ukuran dan menempatkan gambar di tengah
