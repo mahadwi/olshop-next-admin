@@ -14,7 +14,7 @@ export default function ProductPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/products`);
+      const response = await fetch(`${BASE_URL}/products/admin`);
       const data = await response.json();
 
       if (response.ok) {

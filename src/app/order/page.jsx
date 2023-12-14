@@ -95,7 +95,8 @@ const OrderPage = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+            {orders && orders.length > 0 ? (
+              orders.map((order) => (
                 <tr key={order.id}>
                   <td className="py-2 px-4 border">{order.id}</td>
                   <td className="py-2 px-4 border">{order.cart_id}</td>
@@ -116,7 +117,13 @@ const OrderPage = () => {
                   </td>
                   <th className="py-2 px-4 border">{order.order_status[0].status}</th>
                 </tr>
-              ))}
+              ))
+            ) : (
+              // Jika tidak ada data pelanggan, tampilkan pesan atau elemen lain
+              <tr>
+                <td colSpan="3">Tidak ada data pelanggan.</td>
+              </tr>
+            )}
             </tbody>
           </table>
         </div>
