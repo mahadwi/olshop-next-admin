@@ -68,6 +68,8 @@ export default function ProductPage() {
                   <td className="py-2 px-4 border">{product.product_detail[0].weight}</td>
                   <td className="py-2 px-4 border text-center">
                     <Image
+                      width={500}
+                      height={500}
                       src={product.product_detail[0].photo || null}
                       alt={`Product ${product.name}`}
                       className="w-16 h-16 object-cover rounded mx-auto" // Menyesuaikan ukuran dan menempatkan gambar di tengah

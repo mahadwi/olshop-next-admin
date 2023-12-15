@@ -31,11 +31,6 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
     product.product_detail[0].warehouse_id
   );
 
-  useEffect(() => {
-    fetchCategoryOptions();
-    fetchWarehouseOptions();
-  }, [fetchCategoryOptions, fetchWarehouseOptions]);
-
   const fetchCategoryOptions = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/category`, {
@@ -75,6 +70,11 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
       console.error("Error fetching warehouses:", error.message);
     }
   }, [token]);
+
+  useEffect(() => {
+    fetchCategoryOptions();
+    fetchWarehouseOptions();
+  }, [fetchCategoryOptions, fetchWarehouseOptions]);
 
   const handleModal = () => {
     setIsOpen(!isOpen);
@@ -271,6 +271,8 @@ export default function EditDeleteProduct({ product, refreshProducts }) {
                 {imagePreview && (
                   <div className="image-preview-container">
                     <Image
+                      width={500}
+                      height={500}
                       src={imagePreview}
                       alt="Preview"
                       className="image-preview w-full h-auto"
