@@ -1,6 +1,6 @@
 // src/app/product/components/addProduct.js
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import BASE_URL from "@/lib/baseUrl";
 import { getCookie } from "cookies-next";
@@ -26,7 +26,8 @@ export default function AddProduct({ refreshProducts }) {
   const router = useRouter();
   const token = getCookie("adminAccessToken");
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
+    // Your existing code for fetching categories
     try {
       const categoriesResponse = await fetch(`${BASE_URL}/category`, {
         method: "GET",
@@ -46,9 +47,10 @@ export default function AddProduct({ refreshProducts }) {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [token]);
 
-  const fetchWarehouses = async () => {
+  const fetchWarehouses = useCallback(async () => {
+    // Your existing code for fetching warehouses
     try {
       const warehousesResponse = await fetch(`${BASE_URL}/warehouse`, {
         method: "GET",
@@ -68,12 +70,20 @@ export default function AddProduct({ refreshProducts }) {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
-    fetchCategories();
-    fetchWarehouses();
-  }, []);
+    const fetchData = async () => {
+      try {
+        await fetchCategories();
+        await fetchWarehouses();
+      } catch (error) {
+        console.error('Error mengambil data:', error);
+      }
+    };
+
+    fetchData();
+  }, [fetchCategories, fetchWarehouses]);
 
   const handleModal = () => {
     setIsOpen(!isOpen);

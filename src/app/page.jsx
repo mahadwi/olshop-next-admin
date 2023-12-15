@@ -13,6 +13,7 @@ export default async function Home() {
   }
 
   const Customers = await getAllCustomer(token.value);
+ 
   const cusLength = Customers.data ? Customers.data.length : 0;
 
   const resProducts = await getAllProduct(token.value);
@@ -48,14 +49,22 @@ export default async function Home() {
               </tr>
             </thead>
             <tbody>
-              {Customers.data.map((customer, index) => (
+            {Customers.data && Customers.data.length > 0 ? (
+              // Jika ada data pelanggan, tampilkan dalam bentuk tabel
+              Customers.data.map((customer, index) => (
                 <tr key={customer.id}>
                   <td className="hidden sm:block">{index + 1}</td>
                   <td>{customer.username}</td>
                   <td>{customer.email}</td>
                   <td>{customer.phone}</td>
                 </tr>
-              ))}
+              ))
+            ) : (
+              // Jika tidak ada data pelanggan, tampilkan pesan atau elemen lain
+              <tr>
+                <td colSpan="3">Tidak ada data pelanggan.</td>
+              </tr>
+            )}
             </tbody>
           </table>
         </div>

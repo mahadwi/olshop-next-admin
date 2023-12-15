@@ -737,7 +737,7 @@ export default function ProductTable() {
                   }`}
                 >
                   <span className="sr-only">Previous</span>
-                  <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
+                  {/* <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" /> */}
                 </a>
                 {generatePageNumbers(totalPages, currentPage).map((pageNumber) => (
                   <a
@@ -764,7 +764,7 @@ export default function ProductTable() {
                   }`}
                 >
                   <span className="sr-only">Next</span>
-                  <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
+                  {/* <ChevronRightIcon className="h-4 w-4" aria-hidden="true" /> */}
                 </a>
               </nav>
             </div>

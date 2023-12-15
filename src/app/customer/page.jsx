@@ -27,11 +27,17 @@ export default async function Page() {
               </tr>
             </thead>
             <tbody>
-              {Customers.data.map((customer, index) => (
+            {Customers.data && Customers.data.length > 0 ? (
+              Customers.data.map((customer, index) => (
                 <tr key={customer.id}>
                   <Customer customer={customer} index={index} />
                 </tr>
-              ))}
+              )) 
+              ): (
+                <tr>
+                  <td colSpan="3">Tidak ada data pelanggan.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
